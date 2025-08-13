@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minha conta — Disco Coffee Club</title>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--sand:#E9DFCC;--gold:#E2C77A;--stroke:#232933;--bg:#0b0f14}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:#F5F1EA;font-family:Inter,system-ui}
+  .container{width:min(900px,92%);margin:30px auto}
+  .card{background:#0f141b;border:1px solid var(--stroke);border-radius:14px;padding:16px}
+  label{display:block;margin:.5rem 0 .25rem}
+  input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--stroke);background:#0b1016;color:#fff}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn{display:inline-block;background:var(--gold);color:#1a120a;font-weight:800;padding:10px 14px;border-radius:12px;border:0;cursor:pointer}
+  .muted{color:#CFC7BD}
+  nav a{color:#F5F1EA;text-decoration:none}
+</style>
+</head>
+<body>
+  <div class="container">
+    <p><a href="index.html">← Disco Coffee Club</a></p>
+    <h1>Minha conta</h1>
+
+    <div class="card" id="loginCard">
+      <p class="muted">Faça login para salvar seus dados e ver seu histórico.</p>
+      <div class="row">
+        <div><label>E-mail</label><input id="accEmail" placeholder="voce@email.com"></div>
+        <div style="display:flex;align-items:end"><button class="btn" id="loginBtn">Entrar com link mágico</button></div>
+      </div>
+      <p class="muted">Sem servidor? Sem problema — use o formulário abaixo para <strong>cadastrar seus dados localmente</strong> e o checkout será preenchido.</p>
+    </div>
+
+    <h3 style="margin-top:24px">Dados para entrega</h3>
+    <div class="card">
+      <div class="row">
+        <div><label>Nome</label><input id="accNome" placeholder="Seu nome"></div>
+        <div><label>Telefone</label><input id="accPhone" placeholder="(11) 99999-9999"></div>
+      </div>
+      <div class="row">
+        <div><label>CEP</label><input id="accCEP" placeholder="00000-000" maxlength="9"></div>
+        <div><label>Cidade/UF</label><input id="accCityUF" placeholder="São Paulo/SP"></div>
+      </div>
+      <div class="row">
+        <div><label>Rua</label><input id="accStreet" placeholder="Rua Exemplo"></div>
+        <div><label>Número</label><input id="accNumber" placeholder="123"></div>
+      </div>
+      <div class="row">
+        <div><label>Bairro</label><input id="accDistrict" placeholder="Centro"></div>
+        <div><label>Complemento</label><input id="accComp" placeholder="Apto 12"></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px">
+        <button class="btn" id="saveLocal">Salvar localmente</button>
+        <button class="btn" id="clearLocal" style="background:#2a3340;color:#fff">Limpar</button>
+      </div>
+      <p class="muted" id="saveMsg" style="margin-top:8px"></p>
+    </div>
+
+    <h3 style="margin-top:24px">Histórico de pedidos</h3>
+    <div class="card" id="ordersCard">
+      <p class="muted">Ao concluir compras, os pedidos aparecem aqui (neste navegador). Em produção, usamos Supabase + Webhook do Mercado Pago.</p>
+      <div id="ordersList"></div>
+    </div>
+  </div>
+
+<script type="module">
+const $=id=>document.getElementById(id);
+const key='dcc_user';
+function load(){ try{return JSON.parse(localStorage.getItem(key)||'{}');}catch(_){return{};} }
+function save(o){ localStorage.setItem(key, JSON.stringify(o)); }
+function fill(){ const u=load(); ['Email','Nome','Phone','CEP','CityUF','Street','Number','District','Comp']
+  .forEach(k=>{ const el=$(('acc'+k)); if(el) el.value=u[k.toLowerCase()]||''; }); }
+$('saveLocal').onclick=()=>{
+  const u={ email:$('accEmail').value.trim(), nome:$('accNome').value.trim(), phone:$('accPhone').value.trim(),
+            cep:$('accCEP').value.trim(), cityuf:$('accCityUF').value.trim(), street:$('accStreet').value.trim(),
+            number:$('accNumber').value.trim(), district:$('accDistrict').value.trim(), comp:$('accComp').value.trim() };
+  save(u); $('saveMsg').textContent='Dados salvos neste navegador. O carrinho vai pré-preencher CEP.';
+};
+$('clearLocal').onclick=()=>{ localStorage.removeItem(key); fill(); $('saveMsg').textContent='Dados apagados.'; };
+fill();
+
+// Placeholder Supabase (habilita quando as envs existirem no Vercel)
+document.getElementById('loginBtn').onclick=()=>{
+  alert('Para login real: defina SUPABASE_URL e SUPABASE_ANON na Vercel e eu habilito o link mágico aqui.');
+};
+</script>
+</body></html>
